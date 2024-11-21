@@ -1,0 +1,11 @@
+# Ignorar o arquivo de variáveis de ambiente
+.env
+
+# Ignorar dependências do Node.js
+node_modules/
+
+# Ignorar outros arquivos desnecessários
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

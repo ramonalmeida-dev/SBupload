@@ -7,7 +7,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 const BUCKET_NAME = process.env.BUCKET_NAME;
 const FOLDER_NAME = process.env.FOLDER_NAME;
 
-// Valida variáveis de ambiente
+// Validação de variáveis de ambiente
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY || !BUCKET_NAME || !FOLDER_NAME) {
   console.error('Erro: Variáveis de ambiente não configuradas corretamente.');
   process.exit(1);
@@ -20,8 +20,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    console.log("Recebendo requisição...");
-
     // Valida o corpo da requisição
     const inputJson = req.body;
     if (!inputJson || typeof inputJson !== 'object') {
@@ -34,10 +32,10 @@ module.exports = async (req, res) => {
     const jsonText = JSON.stringify(inputJson, null, 2);
     const jsonBuffer = Buffer.from(jsonText);
 
-    // Define o nome do arquivo como o UUID
+    // Define o nome do arquivo como UUID
     const fileName = `${FOLDER_NAME}/${uuidv4()}.json`;
 
-    console.log("Preparando para fazer upload com o nome:", fileName);
+    console.log("Preparando para fazer upload no Supabase com o nome:", fileName);
 
     // Faz o upload para o Supabase
     const { data, error } = await supabase.storage
