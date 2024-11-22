@@ -54,13 +54,20 @@ module.exports = async (req, res) => {
     console.log("Upload realizado com sucesso!");
 
     // Obtém a URL pública do arquivo
-    const { publicUrl } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+    const { data: publicData, error: publicError } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(fileName);
 
-    console.log("URL Pública gerada:", publicUrl);
+    if (publicError) {
+      console.error("Erro ao obter a URL pública:", publicError.message);
+      return res.status(500).json({ error: 'Erro ao gerar a URL pública do arquivo.' });
+    }
+
+    console.log("URL Pública gerada:", publicData.publicUrl);
 
     return res.status(200).json({
       message: "JSON salvo com sucesso no Supabase!",
-      fileUrl: publicUrl,
+      fileUrl: publicData.publicUrl,
       fileName: fileName,
     });
   } catch (err) {
