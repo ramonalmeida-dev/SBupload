@@ -26,16 +26,12 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Payload inválido. Envie um JSON válido.' });
     }
 
-    console.log("JSON recebido:", inputJson);
-
     // Converte o JSON em buffer
     const jsonText = JSON.stringify(inputJson, null, 2);
     const jsonBuffer = Buffer.from(jsonText);
 
     // Define o nome do arquivo como UUID
     const fileName = `${FOLDER_NAME}/${uuidv4()}.json`;
-
-    console.log("Preparando para fazer upload no Supabase com o nome:", fileName);
 
     // Faz o upload para o Supabase
     const { data, error } = await supabase.storage
@@ -51,8 +47,6 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Erro ao fazer upload no Supabase.' });
     }
 
-    console.log("Upload realizado com sucesso!");
-
     // Obtém a URL pública do arquivo
     const { data: publicData, error: publicError } = supabase.storage
       .from(BUCKET_NAME)
@@ -63,13 +57,8 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Erro ao gerar a URL pública do arquivo.' });
     }
 
-    console.log("URL Pública gerada:", publicData.publicUrl);
-
-    return res.status(200).json({
-      message: "JSON salvo com sucesso no Supabase!",
-      fileUrl: publicData.publicUrl,
-      fileName: fileName,
-    });
+    // Retorna somente a URL
+    return res.status(200).send(publicData.publicUrl);
   } catch (err) {
     console.error("Erro ao processar o webhook:", err.message);
     return res.status(500).json({ error: 'Erro interno ao processar o JSON.' });
