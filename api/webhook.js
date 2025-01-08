@@ -13,7 +13,7 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY || !BUCKET_NAME || !F
   process.exit(1);
 }
 
-// Webhook para processar o JSON recebido
+// Webhook para processar o Base64 recebido
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido. Use POST.' });
@@ -21,23 +21,23 @@ module.exports = async (req, res) => {
 
   try {
     // Valida o corpo da requisição
-    const inputJson = req.body;
-    if (!inputJson || typeof inputJson !== 'object') {
-      return res.status(400).json({ error: 'Payload inválido. Envie um JSON válido.' });
+    const base64RawData = req.body;
+
+    if (!base64RawData || typeof base64RawData !== 'string') {
+      return res.status(400).json({ error: 'Payload inválido. Envie uma Base64 válida.' });
     }
 
-    // Converte o JSON em buffer
-    const jsonText = JSON.stringify(inputJson, null, 2);
-    const jsonBuffer = Buffer.from(jsonText);
+    // Converte o raw Base64 em buffer
+    const imageBuffer = Buffer.from(base64RawData, 'base64');
 
-    // Define o nome do arquivo como UUID
-    const fileName = `${FOLDER_NAME}/${uuidv4()}.json`;
+    // Define o nome do arquivo como UUID e extensão PNG
+    const fileName = `${uuidv4()}.png`;
 
     // Faz o upload para o Supabase
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
-      .upload(fileName, jsonBuffer, {
-        contentType: "application/json",
+      .upload(fileName, imageBuffer, {
+        contentType: "image/png",
         cacheControl: "3600",
         upsert: false,
       });
@@ -57,10 +57,10 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Erro ao gerar a URL pública do arquivo.' });
     }
 
-    // Retorna somente a URL
-    return res.status(200).send(publicData.publicUrl);
+    // Retorna somente a URL pública
+    return res.status(200).json({ publicUrl: publicData.publicUrl });
   } catch (err) {
     console.error("Erro ao processar o webhook:", err.message);
-    return res.status(500).json({ error: 'Erro interno ao processar o JSON.' });
+    return res.status(500).json({ error: 'Erro interno ao processar a imagem.' });
   }
 };
