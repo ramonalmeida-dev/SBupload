@@ -30,8 +30,8 @@ module.exports = async (req, res) => {
     // Converte o raw Base64 em buffer
     const imageBuffer = Buffer.from(base64RawData, 'base64');
 
-    // Define o nome do arquivo como UUID e extensão PNG
-    const fileName = `${uuidv4()}.png`;
+    // Define o nome do arquivo com caminho completo para a pasta especificada
+    const fileName = `${FOLDER_NAME}/${uuidv4()}.png`;
 
     // Faz o upload para o Supabase
     const { data, error } = await supabase.storage
