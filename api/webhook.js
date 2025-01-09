@@ -15,6 +15,16 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY || !BUCKET_NAME || !F
 
 // Webhook para processar o Base64 recebido
 module.exports = async (req, res) => {
+  // Adiciona os cabeçalhos CORS
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Permite todas as origens (altere para um domínio específico em produção)
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS'); // Métodos permitidos
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Cabeçalhos permitidos
+
+  // Trata requisições OPTIONS (pré-verificação CORS)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido. Use POST.' });
   }
